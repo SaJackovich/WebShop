@@ -727,8 +727,6 @@
 							</div>
 						</li>
 
-						<enter:IsAnonUser userId="${userId}" userAvatar="${userAvatar}" userName="${userName}"/>
-
                         <enter:locale/>
 
 					</ul>
