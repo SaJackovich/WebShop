@@ -8,6 +8,7 @@ import handler.captcha.AbstractCaptchaHandler;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.Map;
 
 public class CookieCaptchaHandler extends AbstractCaptchaHandler {
@@ -37,11 +38,9 @@ public class CookieCaptchaHandler extends AbstractCaptchaHandler {
     }
 
     private int getOldestCaptchaIdByCookie(HttpServletRequest request) {
-        for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().startsWith(CaptchaParameterContainer.CAPTCHA)) {
-                findValidCookie(cookie);
-            }
-        }
+        Arrays.stream(request.getCookies())
+                .filter(x -> x.getName().startsWith(CaptchaParameterContainer.CAPTCHA))
+                .forEach(this::findValidCookie);
         return Integer.parseInt(oldestCookie.getValue());
     }
 

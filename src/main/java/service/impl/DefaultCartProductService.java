@@ -6,14 +6,15 @@ import repository.CartRepository;
 import service.CartProductService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DefaultCartProductService implements CartProductService<Product> {
 
     private CartRepository<Product> repository;
+
+    private BigDecimal decimal;
 
     public DefaultCartProductService(CartRepository<Product> repository) {
         this.repository = repository;
@@ -21,11 +22,8 @@ public class DefaultCartProductService implements CartProductService<Product> {
 
     @Override
     public void add(List<CartProduct> cartProducts) {
-        Map<Product, Integer> products = new HashMap<>();
-        for (CartProduct cartProduct : cartProducts){
-            products.put(cartProduct.getProduct(), cartProduct.getAmount());
-        }
-        repository.addAll(products);
+        repository.addAll(cartProducts.stream()
+                .collect(Collectors.toMap(CartProduct::getProduct, CartProduct::getAmount)));
     }
 
     @Override
@@ -40,15 +38,14 @@ public class DefaultCartProductService implements CartProductService<Product> {
 
     @Override
     public List<CartProduct> getAll() {
-        List<CartProduct> cartProducts = new ArrayList<>();
-        for (Map.Entry<Product, Integer> product : repository.getAll().entrySet()){
-            CartProduct cartProduct = new CartProduct.CartProductBuilder()
-                    .product(product.getKey())
-                    .amount(product.getValue())
-                    .build();
-            cartProducts.add(cartProduct);
-        }
-        return cartProducts;
+        return repository.getAll()
+                .entrySet()
+                .stream()
+                .map(entry -> new CartProduct.CartProductBuilder()
+                        .product(entry.getKey())
+                        .amount(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -58,12 +55,13 @@ public class DefaultCartProductService implements CartProductService<Product> {
 
     @Override
     public BigDecimal allAmount() {
-        Map<Product, Integer> cartProducts = repository.getAll();
-        BigDecimal amount = new BigDecimal(0);
-        for (Map.Entry<Product, Integer> product : cartProducts.entrySet()){
-            amount = amount.subtract(new BigDecimal(product.getValue()));
-        }
-        return amount;
+        decimal = new BigDecimal(0);
+        repository.getAll()
+                .entrySet()
+                .stream()
+                .map(x -> new BigDecimal(x.getValue()))
+                .forEach(x -> decimal = decimal.add(x));
+        return decimal;
     }
 
     @Override

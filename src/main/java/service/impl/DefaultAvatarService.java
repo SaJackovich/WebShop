@@ -44,15 +44,20 @@ public class DefaultAvatarService extends AvatarService{
         AvatarCreator creator = new AvatarCreator();
         try {
             Avatar avatar = creator.createAvatarByRequest(request);
-            if (Objects.nonNull(avatar)) {
-                String avatarFullName = getFullAvatarName(request, avatar);
-                avatar.setFullFileName(avatarFullName);
-                String fullFileName = FILENAME_FOR_SAVE_AVATAR + avatarFullName;
-                saveAvatar(fullFileName, avatar.getImage());
-                return Optional.of(avatar);
-            }
+            return getAvatar(avatar, request);
         } catch (IOException | ServletException e) {
             log.error(AVATAR_NOT_CREATE, e);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Avatar> getAvatar(Avatar avatar, HttpServletRequest request) throws IOException {
+        if (Objects.nonNull(avatar)) {
+            String avatarFullName = getFullAvatarName(request, avatar);
+            avatar.setFullFileName(avatarFullName);
+            String fullFileName = FILENAME_FOR_SAVE_AVATAR + avatarFullName;
+            saveAvatar(fullFileName, avatar.getImage());
+            return Optional.of(avatar);
         }
         return Optional.empty();
     }

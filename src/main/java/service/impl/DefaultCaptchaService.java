@@ -48,15 +48,11 @@ public class DefaultCaptchaService implements CaptchaService{
 
     @Override
     public void removeOldCaptcha() {
-        List<Integer> removeId = new ArrayList<>();
-        for (Map.Entry<Integer, Captcha> entry : repository.getAll().entrySet()){
-            if (!entry.getValue().isValid()){
-                removeId.add(entry.getKey());
-            }
-        }
-        for (Integer id : removeId){
-            repository.remove(id);
-        }
+        repository.getAll()
+                .values()
+                .stream()
+                .filter(x -> !x.isValid())
+                .forEach(x -> repository.remove(x.getId()));
     }
 
     @Override

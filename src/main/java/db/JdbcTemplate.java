@@ -3,6 +3,7 @@ package db;
 import db.mapper.Mapper;
 import db.specification.SQLSpecification;
 import org.apache.log4j.Logger;
+import repository.impl.UserRepository;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class JdbcTemplate<A> {
 
@@ -28,11 +30,9 @@ public class JdbcTemplate<A> {
     }
 
     public List<A> getAllBySpecification(Connection connection, SQLSpecification sqlSpecification) throws SQLException {
-        if (Objects.nonNull(sqlSpecification.getParams())){
-            return getByQueryAndParameters(connection, sqlSpecification);
-        } else {
-            return getOnlyByQuery(connection, sqlSpecification);
-        }
+        return Objects.nonNull(sqlSpecification.getParams())
+                ? getByQueryAndParameters(connection, sqlSpecification)
+                : getOnlyByQuery(connection, sqlSpecification);
     }
 
     public int getCountBySpecification(Connection connection, SQLSpecification specification) throws SQLException {
