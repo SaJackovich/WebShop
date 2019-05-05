@@ -16,5 +16,4 @@ public class PageInputFieldConstant {
     public static final String MAX_PRICE = "maxPrice";
     public static final String LIMIT = "productLimit";
     public static final String PAGE = "page";
-    
 }
